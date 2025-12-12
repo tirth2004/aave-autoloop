@@ -37,6 +37,14 @@ contract AutoLooper is Borrow, Swap {
         uint256 totalDebtBase
     );
 
+    event PositionUnwound(
+        address indexed user,
+        address indexed recipient,
+        uint256 usdcRepaid,
+        uint256 wethReturned,
+        uint256 usdcLeftover
+    );
+
     /// @notice user opens a leveraged long WETH position (WETH collateral, borrow USDC, swap -> WETH, resupply)
     function openPosition(OpenParams calldata params) external {
         require(params.initialCollateralWeth > 0, "no collateral");
@@ -111,6 +119,72 @@ contract AutoLooper is Borrow, Swap {
         );
 
         require(finalHf >= params.minHealthFactor, "final HF below min");
+    }
+
+    /// @notice Unwind the leveraged position using user-provided USDC:
+    ///         1) User sends USDC to this contract
+    ///         2) Contract repays all USDC debt on Aave
+    ///         3) Contract withdraws all WETH collateral
+    ///         4) Sends all WETH + leftover USDC to `recipient`
+    /// @dev Assumes the position is: collateral = WETH, debt = USDC.
+    function unwindWithUserUSDC(address recipient) external {
+        require(recipient != address(0), "bad recipient");
+
+        // 1) How much USDC debt does this contract have?
+        // Reuses Borrow.getVariableDebt(address token)
+        uint256 debt = getVariableDebt(USDC);
+        require(debt > 0, "no debt to unwind");
+
+        // 2) Pull USDC from the caller. They must have approved this contract first.
+        IERC20(USDC).transferFrom(msg.sender, address(this), debt);
+
+        // 3) Approve Aave Pool & repay all USDC variable debt
+        IERC20(USDC).approve(address(pool), debt);
+
+        uint256 repaid = pool.repay({
+            asset: USDC,
+            amount: type(uint256).max, // repay full variable debt
+            interestRateMode: 2, // 2 = variable rate
+            onBehalfOf: address(this)
+        });
+
+        // Double-check that the debt is really gone
+        uint256 remainingDebt = getVariableDebt(USDC);
+        require(remainingDebt == 0, "debt not fully repaid");
+
+        // 4) Withdraw all WETH collateral back to this contract
+        IPool.ReserveData memory reserve = aavePool.getReserveData(WETH);
+        uint256 aTokenBal = IERC20(reserve.aTokenAddress).balanceOf(
+            address(this)
+        );
+
+        if (aTokenBal > 0) {
+            // type(uint256).max = withdraw full aToken balance
+            aavePool.withdraw({
+                asset: WETH,
+                amount: type(uint256).max,
+                to: address(this)
+            });
+        }
+
+        // 5) Send all WETH + leftover USDC to recipient
+        uint256 wethReturned = IERC20(WETH).balanceOf(address(this));
+        uint256 usdcLeftover = IERC20(USDC).balanceOf(address(this));
+
+        if (wethReturned > 0) {
+            IERC20(WETH).transfer(recipient, wethReturned);
+        }
+        if (usdcLeftover > 0) {
+            IERC20(USDC).transfer(recipient, usdcLeftover);
+        }
+
+        emit PositionUnwound(
+            msg.sender,
+            recipient,
+            repaid,
+            wethReturned,
+            usdcLeftover
+        );
     }
 
     // ---------- OPTIONAL VIEW HELPERS FOR TESTS / UI ----------
