@@ -18,22 +18,13 @@ contract SwapTest is Test {
 
         // fund the test address with WETH on the fork
         deal(WETH, address(this), 1 ether);
-        console.log(
-            "Tester WETH before transfer:",
-            weth.balanceOf(address(this))
-        );
+        console.log("Tester WETH before transfer:", weth.balanceOf(address(this)));
 
         // send WETH to the Swap contract (it is the actual swapper)
         weth.transfer(address(target), 0.1 ether);
 
-        console.log(
-            "Tester WETH after transfer:",
-            weth.balanceOf(address(this))
-        );
-        console.log(
-            "Swap contract WETH after funding:",
-            weth.balanceOf(address(target))
-        );
+        console.log("Tester WETH after transfer:", weth.balanceOf(address(this)));
+        console.log("Swap contract WETH after funding:", weth.balanceOf(address(target)));
     }
 
     function test_swap_weth_to_usdc() public {
@@ -47,10 +38,7 @@ contract SwapTest is Test {
         console.log("Fee tier:", UNISWAP_V3_POOL_FEE_WETH_USDC);
 
         // sanity: make sure the Swap contract actually has enough WETH
-        require(
-            weth.balanceOf(address(target)) >= amountIn,
-            "Swap contract has insufficient WETH"
-        );
+        require(weth.balanceOf(address(target)) >= amountIn, "Swap contract has insufficient WETH");
 
         console.log("Calling swapExactInputSingle...");
 
@@ -65,18 +53,9 @@ contract SwapTest is Test {
 
         console.log("=== Post-swap state ===");
         console.log("Amount out (USDC):", amountOut);
-        console.log(
-            "Tester USDC balance after:",
-            usdc.balanceOf(address(this))
-        );
-        console.log(
-            "Swap USDC balance after:",
-            usdc.balanceOf(address(target))
-        );
-        console.log(
-            "Swap WETH balance after:",
-            weth.balanceOf(address(target))
-        );
+        console.log("Tester USDC balance after:", usdc.balanceOf(address(this)));
+        console.log("Swap USDC balance after:", usdc.balanceOf(address(target)));
+        console.log("Swap WETH balance after:", weth.balanceOf(address(target)));
 
         assertGt(usdc.balanceOf(address(this)), 0, "No USDC received");
     }

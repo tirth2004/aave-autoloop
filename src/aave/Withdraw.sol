@@ -12,12 +12,7 @@ contract Withdraw {
     function supply(address token, uint256 amount) public {
         IERC20(token).transferFrom(msg.sender, address(this), amount);
         IERC20(token).approve(address(pool), amount);
-        pool.supply({
-            asset: token,
-            amount: amount,
-            onBehalfOf: address(this),
-            referralCode: 0
-        });
+        pool.supply({asset: token, amount: amount, onBehalfOf: address(this), referralCode: 0});
     }
 
     function getSupplyBalance(address token) public view returns (uint256) {
@@ -26,11 +21,7 @@ contract Withdraw {
     }
 
     function withdraw(address token, uint256 amount) public returns (uint256) {
-        uint256 withdrawn = pool.withdraw({
-            asset: token,
-            amount: amount,
-            to: address(this)
-        });
+        uint256 withdrawn = pool.withdraw({asset: token, amount: amount, to: address(this)});
         return withdrawn;
     }
 }

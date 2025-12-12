@@ -13,12 +13,7 @@ contract Repay {
     function supply(address token, uint256 amount) public {
         IERC20(token).transferFrom(msg.sender, address(this), amount);
         IERC20(token).approve(address(pool), amount);
-        pool.supply({
-            asset: token,
-            amount: amount,
-            onBehalfOf: address(this),
-            referralCode: 0
-        });
+        pool.supply({asset: token, amount: amount, onBehalfOf: address(this), referralCode: 0});
     }
 
     function borrow(address token, uint256 amount) public {
@@ -35,8 +30,7 @@ contract Repay {
 
     function getVariableDebt(address token) public view returns (uint256) {
         IPool.ReserveData memory reserve = pool.getReserveData(token);
-        return
-            IERC20(reserve.variableDebtTokenAddress).balanceOf(address(this));
+        return IERC20(reserve.variableDebtTokenAddress).balanceOf(address(this));
     }
 
     function repay(address token) public returns (uint256) {

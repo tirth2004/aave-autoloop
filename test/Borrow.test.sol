@@ -50,10 +50,6 @@ contract BorrowTest is Test {
 
         assertEq(bal, 100 * 1e18, "DAI balance");
         assertGe(debt, bal, "Debt");
-        assertEq(
-            target.getVariableDebt(DAI),
-            debt,
-            "Variable debt after borrow"
-        );
+        assertEq(target.getVariableDebt(DAI), debt, "Variable debt after borrow");
     }
 }

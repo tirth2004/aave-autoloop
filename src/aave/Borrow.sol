@@ -14,12 +14,7 @@ contract Borrow {
     function supply(address token, uint256 amount) public {
         IERC20(token).transferFrom(msg.sender, address(this), amount);
         IERC20(token).approve(address(pool), amount);
-        pool.supply({
-            asset: token,
-            amount: amount,
-            onBehalfOf: address(this),
-            referralCode: 0
-        });
+        pool.supply({asset: token, amount: amount, onBehalfOf: address(this), referralCode: 0});
     }
 
     function approxMaxBorrow(address token) public view returns (uint256) {
@@ -27,17 +22,13 @@ contract Borrow {
         uint256 price = oracle.getAssetPrice(token);
         uint256 decimals = IERC20Metadata(token).decimals();
 
-        (, , uint256 availableToBorrowUsd, , , ) = pool.getUserAccountData(
-            address(this)
-        );
+        (,, uint256 availableToBorrowUsd,,,) = pool.getUserAccountData(address(this));
 
         return (availableToBorrowUsd * (10 ** decimals)) / price;
     }
 
     function getHealthFactor() public view returns (uint256) {
-        (, , , , , uint256 healthFactor) = pool.getUserAccountData(
-            address(this)
-        );
+        (,,,,, uint256 healthFactor) = pool.getUserAccountData(address(this));
         return healthFactor;
     }
 
@@ -55,7 +46,6 @@ contract Borrow {
 
     function getVariableDebt(address token) public view returns (uint256) {
         IPool.ReserveData memory reserve = pool.getReserveData(token);
-        return
-            IERC20(reserve.variableDebtTokenAddress).balanceOf(address(this));
+        return IERC20(reserve.variableDebtTokenAddress).balanceOf(address(this));
     }
 }
