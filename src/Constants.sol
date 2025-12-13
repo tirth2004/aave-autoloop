@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.28;
 
-address constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
-address constant DAI = 0x6B175474E89094C44Da98b954EedeAC495271d0F;
+// Sepolia Testnet Addresses (TEMPORARY)
+address constant WETH = 0xC558DBdd856501FCd9aaF1E62eae57A9F0629a3c;
+address constant DAI = 0x3E622317F8f93Ef2Ee0f06753c5BC5b7172E41ad;
 
-// Aave V3
-address constant POOL = 0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2;
-address constant ORACLE = 0x54586bE62E3c3580375aE3723C145253060Ca0C2;
+// Aave V3 Sepolia
+address constant POOL = 0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951;
+address constant ORACLE = 0x2da88497588bf89281816106C7259e31AF45a663;
 
-// Uniswap V3
-address constant UNISWAP_V3_SWAP_ROUTER_02 = 0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45;
+// Uniswap V3 Sepolia
+address constant UNISWAP_V3_SWAP_ROUTER_02 = 0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E;
 uint24 constant UNISWAP_V3_POOL_FEE_DAI_WETH = 3000;
 
-address constant USDC = 0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48;
+address constant USDC = 0x94a9D9AC8a22534E3FaCa9F4e7F2E2cf85d5E4C8;
+address constant USDT = 0xaA8E23Fb1079EA71e0a56F48a2aA51851D8433D0;
 uint24 constant UNISWAP_V3_POOL_FEE_WETH_USDC = 3000;
+uint24 constant UNISWAP_V3_POOL_FEE_USDT_USDC = 500; // Common fee tier for stablecoin pairs
