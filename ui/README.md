@@ -1,66 +1,73 @@
-# AutoLooper Reactive UI
+# React + TypeScript + Vite
 
-React + TypeScript + Vite UI for managing AutoLooper reactive positions.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Tech Stack
+Currently, two official plugins are available:
 
-- **Vite** - Build tool
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Ethers.js** - Web3 interactions
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Getting Started
+## React Compiler
 
-### Install Dependencies
-```bash
-npm install
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
+
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-### Run Development Server
-```bash
-npm run dev
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-
-### Build for Production
-```bash
-npm run build
-```
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── Header.tsx           # Top header with logo, network, wallet
-│   ├── PositionCard.tsx      # Individual position card component
-│   └── CreatePositionModal.tsx # Modal for creating new positions
-├── App.tsx                   # Main app component
-├── main.tsx                  # Entry point
-└── index.css                 # Global styles with Tailwind
-```
-
-## Features
-
-- View all positions in a grid layout
-- See position status (Active/Inactive)
-- Display position parameters and current stats
-- Create new positions via modal form
-- Connect wallet functionality
-- Close/Delete positions
-
-## Environment Variables
-
-Create a `.env` file for configuration:
-```
-VITE_RPC_URL=your_rpc_url
-VITE_CONTRACT_ADDRESS=your_contract_address
-```
-
-## Next Steps
-
-- [ ] Integrate with smart contracts
-- [ ] Add real-time data fetching
-- [ ] Implement transaction handling
-- [ ] Add error handling and loading states
-- [ ] Connect to Reactive Network
