@@ -14,28 +14,21 @@ contract DeployAutoLooperReactive is Script {
         console.log("Deploying AutoLooperReactive to Reactive Network...");
         console.log("Deployer address:", deployer);
 
-        // Get configuration from environment variables
-        // Origin chain (where Chainlink feed is)
         uint256 originChainId = vm.envOr("ORIGIN_CHAIN_ID", uint256(11155111)); // Default: Sepolia
         address originFeed = vm.envAddress("ORIGIN_FEED");
 
-        // Destination chain (where AutoLooper is deployed)
         uint256 destinationChainId = vm.envOr(
             "DESTINATION_CHAIN_ID",
             uint256(11155111)
-        ); // Default: Sepolia
+        );
 
-        // Helper contract address (must be deployed first)
         address helperContract = vm.envAddress("HELPER_CONTRACT");
 
-        // AutoLooper contract address
         address autoLooper = vm.envAddress("AUTOLOOPER_ADDRESS");
 
-        // Owner and recipient (default to deployer)
         address owner = vm.envOr("OWNER_ADDRESS", deployer);
         address recipient = vm.envOr("RECIPIENT_ADDRESS", deployer);
 
-        // AutoLooper.OpenParams from environment
         AutoLooper.OpenParams memory openParams = AutoLooper.OpenParams({
             initialCollateralWeth: vm.envOr(
                 "INITIAL_COLLATERAL_WETH",
@@ -65,7 +58,6 @@ contract DeployAutoLooperReactive is Script {
         console.log("Min Health Factor:", openParams.minHealthFactor);
         console.log("Min Swap Out:", openParams.minSwapOut);
 
-        // Validate required addresses
         require(originFeed != address(0), "ORIGIN_FEED not set");
         require(helperContract != address(0), "HELPER_CONTRACT not set");
         require(autoLooper != address(0), "AUTOLOOPER_ADDRESS not set");

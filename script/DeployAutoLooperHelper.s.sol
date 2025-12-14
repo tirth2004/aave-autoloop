@@ -16,13 +16,11 @@ contract DeployAutoLooperHelper is Script {
 
         address autoLooperAddress = vm.envOr("AUTOLOOPER_ADDRESS", address(0));
 
-        // Owner and recipient (default to deployer)
         address owner = vm.envOr("OWNER_ADDRESS", deployer);
         address recipient = vm.envOr("RECIPIENT_ADDRESS", deployer);
 
         vm.startBroadcast(deployerPrivateKey);
 
-        // Deploy AutoLooper if not provided
         AutoLooper autoLooper;
         if (autoLooperAddress == address(0)) {
             console.log(
@@ -36,7 +34,6 @@ contract DeployAutoLooperHelper is Script {
             autoLooper = AutoLooper(autoLooperAddress);
         }
 
-        // Deploy Helper
         AutoLooperHelper helper = new AutoLooperHelper(
             autoLooperAddress,
             owner,
