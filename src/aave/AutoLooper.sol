@@ -54,17 +54,14 @@ contract AutoLooper is Borrow, Swap {
             "borrowBps out of range"
         );
 
-        // 1) Pull WETH from user into THIS contract (AutoLooper)
         IERC20(WETH).transferFrom(
             msg.sender,
             address(this),
             params.initialCollateralWeth
         );
 
-        // 2) Supply initial collateral to Aave (Borrow.supply)
         supply(WETH, params.initialCollateralWeth);
 
-        // 3) Loop a few times:
         uint8 loopsDone = 0;
 
         for (uint8 i = 0; i < params.loops; i++) {
@@ -76,10 +73,8 @@ contract AutoLooper is Borrow, Swap {
                 BPS_DENOMINATOR;
             if (amountToBorrow == 0) break;
 
-            // 3a) Borrow USDC against existing WETH collateral
             borrow(USDC, amountToBorrow);
 
-            // 3b) Swap USDC -> WETH (your working swapExactInputSingle)
             uint256 amountOutWeth = swapExactInputSingle(
                 USDC,
                 WETH,
@@ -89,10 +84,8 @@ contract AutoLooper is Borrow, Swap {
                 address(this)
             );
 
-            // 3c) Resupply extra WETH as more collateral
             supply(WETH, amountOutWeth);
 
-            // 3d) Check health factor, fail fast if too risky
             uint256 hf = getHealthFactor();
             emit LoopStep(i, amountToBorrow, amountOutWeth, hf);
 
@@ -130,15 +123,12 @@ contract AutoLooper is Borrow, Swap {
     function unwindWithUserUSDC(address recipient) external {
         require(recipient != address(0), "bad recipient");
 
-        // 1) How much USDC debt does this contract have?
         // Reuses Borrow.getVariableDebt(address token)
         uint256 debt = getVariableDebt(USDC);
         require(debt > 0, "no debt to unwind");
 
-        // 2) Pull USDC from the caller. They must have approved this contract first.
         IERC20(USDC).transferFrom(msg.sender, address(this), debt);
 
-        // 3) Approve Aave Pool & repay all USDC variable debt
         IERC20(USDC).approve(address(pool), debt);
 
         uint256 repaid = pool.repay({
@@ -148,11 +138,9 @@ contract AutoLooper is Borrow, Swap {
             onBehalfOf: address(this)
         });
 
-        // Double-check that the debt is really gone
         uint256 remainingDebt = getVariableDebt(USDC);
         require(remainingDebt == 0, "debt not fully repaid");
 
-        // 4) Withdraw all WETH collateral back to this contract
         IPool.ReserveData memory reserve = aavePool.getReserveData(WETH);
         uint256 aTokenBal = IERC20(reserve.aTokenAddress).balanceOf(
             address(this)
@@ -167,7 +155,6 @@ contract AutoLooper is Borrow, Swap {
             });
         }
 
-        // 5) Send all WETH + leftover USDC to recipient
         uint256 wethReturned = IERC20(WETH).balanceOf(address(this));
         uint256 usdcLeftover = IERC20(USDC).balanceOf(address(this));
 
