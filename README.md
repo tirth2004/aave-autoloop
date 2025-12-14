@@ -4,6 +4,12 @@ A Reactive-powered leveraged looping strategy on top of Aave V3 that automates m
 
 This project was built for the Reactive Network bounty: Auto-Looper for a Lending Protocol.
 
+NOTE: Before running Tests/Scripts- Make sure you have appropriate constants in the contract. Currently loaded with constant for sepolia. If you intend to run tests/scripts made for mainnet fork - use constants from the backup file. Otherwise tests and scripts will fail/Show un-intended behaviour.
+
+![Arch Diagram](./img/Screenshot%202025-12-15%20at%2003.55.26.png "Arch Diagram")
+
+![Flow Diagram](./img/Screenshot%202025-12-15%20at%2003.57.02.png "Flow Diagram")
+
 
 ## What this repo does
 
